@@ -20,24 +20,24 @@
 // The following code assumes a complex number is
 // an array: [real, imaginary]
 //-------------------------------------------------
-var dft = require('./dft');
+const dft = require("./dft");
 
 function idft(signal) {
-    //Interchange real and imaginary parts
-    var csignal = [];
-    for (var i = 0; i < signal.length; i++) {
-        csignal[i] = [signal[i][1], signal[i][0]];
-    }
+  //Interchange real and imaginary parts
+  const csignal = [];
+  for (let i = 0; i < signal.length; i++) {
+    csignal[i] = [signal[i][1], signal[i][0]];
+  }
 
-    //Apply dft
-    var ps = dft(csignal);
+  //Apply dft
+  const ps = dft(csignal);
 
-    //Interchange real and imaginary parts and normalize
-    var res = [];
-    for (var j = 0; j < ps.length; j++) {
-        res[j] = [ps[j][1] / ps.length, ps[j][0] / ps.length];
-    }
-    return res;
+  //Interchange real and imaginary parts and normalize
+  const res = [];
+  for (let j = 0; j < ps.length; j++) {
+    res[j] = [ps[j][1] / ps.length, ps[j][0] / ps.length];
+  }
+  return res;
 }
 
 module.exports = idft;

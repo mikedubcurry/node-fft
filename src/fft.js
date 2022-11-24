@@ -21,41 +21,40 @@
 // The following code assumes a complex number is
 // an array: [real, imaginary]
 //-------------------------------------------------
-var complex = require('./complex'),
-    fftUtil = require('./fftutil'),
-    twiddle = require('bit-twiddle');
+const complex = require("./complex");
+const fftUtil = require("./fftutil");
+const twiddle = require("bit-twiddle");
 
 module.exports = {
   //-------------------------------------------------
   // Calculate FFT for vector where vector.length
   // is assumed to be a power of 2.
   //-------------------------------------------------
-  fft: function fft(vector) {
-    var X = [],
-        N = vector.length;
+  fft: (vector) => {
+    const X = [];
+    const N = vector.length;
 
     // Base case is X = x + 0i since our input is assumed to be real only.
     if (N == 1) {
-      if (Array.isArray(vector[0])) //If input vector contains complex numbers
-        return [[vector[0][0], vector[0][1]]];      
-      else
-        return [[vector[0], 0]];
+      if (Array.isArray(vector[0]))
+        //If input vector contains complex numbers
+        return [[vector[0][0], vector[0][1]]];
+      else return [[vector[0], 0]];
     }
 
     // Recurse: all even samples
-    var X_evens = fft(vector.filter(even)),
-
-        // Recurse: all odd samples
-        X_odds  = fft(vector.filter(odd));
+    const X_evens = this.fft(vector.filter(even));
+    // Recurse: all odd samples
+    const X_odds = this.fft(vector.filter(odd));
 
     // Now, perform N/2 operations!
-    for (var k = 0; k < N / 2; k++) {
+    for (let k = 0; k < N / 2; k++) {
       // t is a complex number!
-      var t = X_evens[k],
-          e = complex.multiply(fftUtil.exponent(k, N), X_odds[k]);
+      const t = X_evens[k],
+        e = complex.multiply(fftUtil.exponent(k, N), X_odds[k]);
 
       X[k] = complex.add(t, e);
-      X[k + (N / 2)] = complex.subtract(t, e);
+      X[k + N / 2] = complex.subtract(t, e);
     }
 
     function even(__, ix) {
@@ -74,16 +73,16 @@ module.exports = {
   // place implementation, to avoid the memory
   // footprint used by recursion.
   //-------------------------------------------------
-  fftInPlace: function(vector) {
-    var N = vector.length;
+  fftInPlace: (vector) => {
+    const N = vector.length;
 
-    var trailingZeros = twiddle.countTrailingZeros(N); //Once reversed, this will be leading zeros
+    const trailingZeros = twiddle.countTrailingZeros(N); //Once reversed, this will be leading zeros
 
     // Reverse bits
-    for (var k = 0; k < N; k++) {
-      var p = twiddle.reverse(k) >>> (twiddle.INT_BITS - trailingZeros);
+    for (let k = 0; k < N; k++) {
+      const p = twiddle.reverse(k) >>> (twiddle.INT_BITS - trailingZeros);
       if (p > k) {
-        var complexTemp = [vector[k], 0];
+        const complexTemp = [vector[k], 0];
         vector[k] = vector[p];
         vector[p] = complexTemp;
       } else {
@@ -92,15 +91,18 @@ module.exports = {
     }
 
     //Do the DIT now in-place
-    for (var len = 2; len <= N; len += len) {
-      for (var i = 0; i < len / 2; i++) {
-        var w = fftUtil.exponent(i, len);
-        for (var j = 0; j < N / len; j++) {
-          var t = complex.multiply(w, vector[j * len + i + len / 2]);
-          vector[j * len + i + len / 2] = complex.subtract(vector[j * len + i], t);
+    for (let len = 2; len <= N; len += len) {
+      for (let i = 0; i < len / 2; i++) {
+        const w = fftUtil.exponent(i, len);
+        for (let j = 0; j < N / len; j++) {
+          const t = complex.multiply(w, vector[j * len + i + len / 2]);
+          vector[j * len + i + len / 2] = complex.subtract(
+            vector[j * len + i],
+            t
+          );
           vector[j * len + i] = complex.add(vector[j * len + i], t);
         }
       }
     }
-  }
+  },
 };

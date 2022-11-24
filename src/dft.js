@@ -12,26 +12,25 @@
 // primarily designed as an educational and testing
 // tool.
 //------------------------------------------------
-var complex = require('./complex');
-var fftUtil = require('./fftutil');
+const complex = require("./complex");
+const fftUtil = require("./fftutil");
 
 //-------------------------------------------------
 // Calculate brute-force O(n^2) DFT for vector.
 //-------------------------------------------------
-var dft = function(vector) {
-  var X = [],
-      N = vector.length;
+const dft = (vector) => {
+  const X = [],
+    N = vector.length;
 
-  for (var k = 0; k < N; k++) {
+  for (let k = 0; k < N; k++) {
     X[k] = [0, 0]; //Initialize to a 0-valued complex number.
 
-    for (var i = 0; i < N; i++) {
-      var exp = fftUtil.exponent(k * i, N);
-      var term;
-      if (Array.isArray(vector[i]))
-        term = complex.multiply(vector[i], exp)//If input vector contains complex numbers
-      else
-        term = complex.multiply([vector[i], 0], exp);//Complex mult of the signal with the exponential term.  
+    for (let i = 0; i < N; i++) {
+      const exp = fftUtil.exponent(k * i, N);
+      let term;
+      if (Array.isArray(vector[i])) term = complex.multiply(vector[i], exp);
+      //If input vector contains complex numbers
+      else term = complex.multiply([vector[i], 0], exp); //Complex mult of the signal with the exponential term.
       X[k] = complex.add(X[k], term); //Complex summation of X[k] and exponential
     }
   }
